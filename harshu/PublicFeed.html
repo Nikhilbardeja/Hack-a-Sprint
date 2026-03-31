@@ -3,18 +3,15 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Citizen Dashboard</title>
+    <title>Public Feed</title>
 
-    <!-- CSS -->
     <link rel="stylesheet" href="PublicFeed.css" />
-
-    <!-- Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
   </head>
 
   <body>
     <div class="dashboard">
-      <!-- ================= SIDEBAR ================= -->
+      <!-- ================= SIDEBAR (SAME AS DASHBOARD) ================= -->
       <div class="sidebar">
         <div class="brand">
           <i data-lucide="map-pin"></i>
@@ -22,27 +19,28 @@
         </div>
 
         <ul>
-          <li class="active">
-            <a href="Complaint.html">
-              <i data-lucide="plus-circle"></i> Submit Complaint
-            </a>
+          <li onclick="goTo('dashboard.html')">
+            <i data-lucide="layout-dashboard"></i> Dashboard
           </li>
-          <li>
-            <a href="Complaint.html">
-              <i data-lucide="plus-circle"></i> Submit Complaint
-            </a>
+
+          <li onclick="goTo('complaint.html')">
+            <i data-lucide="plus-circle"></i> Submit Complaint
           </li>
-          <li><i data-lucide="file-text"></i> My Complaints</li>
-          <li><i data-lucide="globe"></i> Public Feed</li>
+
+          <li onclick="goTo('my-complaints.html')">
+            <i data-lucide="file-text"></i> My Complaints
+          </li>
+
+          <li class="active"><i data-lucide="globe"></i> Public Feed</li>
         </ul>
       </div>
 
       <!-- ================= MAIN ================= -->
       <div class="main">
-        <!-- TOPBAR -->
+        <!-- TOPBAR (SAME AS DASHBOARD) -->
         <div class="topbar">
           <div class="left">
-            <h3>Citizen Dashboard</h3>
+            <h3>Public Feed</h3>
             <input
               type="text"
               placeholder="Search complaints..."
@@ -57,54 +55,10 @@
         </div>
 
         <!-- TITLE -->
-        <h2 class="title">Overview</h2>
+        <h2 class="title">Recent Complaints</h2>
 
-        <!-- CARDS -->
-        <div class="cards">
-          <div class="card">
-            <i data-lucide="file-text" class="icon blue"></i>
-            <h3 id="total">12</h3>
-            <p>Total</p>
-          </div>
-
-          <div class="card">
-            <i data-lucide="clock" class="icon yellow"></i>
-            <h3 id="pending">5</h3>
-            <p>Pending</p>
-          </div>
-
-          <div class="card">
-            <i data-lucide="alert-triangle" class="icon cyan"></i>
-            <h3 id="progress">3</h3>
-            <p>In Progress</p>
-          </div>
-
-          <div class="card">
-            <i data-lucide="check-circle" class="icon green"></i>
-            <h3 id="resolved">4</h3>
-            <p>Resolved</p>
-          </div>
-        </div>
-
-        <!-- RECENT COMPLAINTS -->
-        <div class="bottom-section">
-          <h3>Recent Complaints</h3>
-
-          <table class="complaint-table">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Title</th>
-                <th>Status</th>
-                <th>Date</th>
-              </tr>
-            </thead>
-
-            <tbody id="complaintBody">
-              <!-- JS will fill -->
-            </tbody>
-          </table>
-        </div>
+        <!-- FEED (ONLY CHANGE PART) -->
+        <div class="feed-container" id="feedContainer"></div>
       </div>
     </div>
 
@@ -112,40 +66,66 @@
     <script>
       lucide.createIcons();
 
-      // Dummy data (later replace with backend)
-      const complaints = [
-        { id: 101, title: "Water Leakage", status: "pending", date: "01 Apr" },
-        {
-          id: 102,
-          title: "Street Light Issue",
-          status: "progress",
-          date: "30 Mar",
-        },
-        {
-          id: 103,
-          title: "Garbage Collection",
-          status: "resolved",
-          date: "28 Mar",
-        },
-      ];
-
-      const tbody = document.getElementById("complaintBody");
-
-      complaints.forEach((c) => {
-        tbody.innerHTML += `
-        <tr>
-          <td>#${c.id}</td>
-          <td>${c.title}</td>
-          <td class="${c.status}">${c.status}</td>
-          <td>${c.date}</td>
-        </tr>
-      `;
-      });
+      function goTo(page) {
+        window.location.href = page;
+      }
 
       function logout() {
         localStorage.clear();
         window.location.href = "login.html";
       }
+
+      // Sample data
+      const complaints = [
+        {
+          title: "Sparking in junction box",
+          desc: "Junction box near temple creating fire hazard.",
+          status: "pending",
+          category: "Electricity",
+          time: "1 day ago",
+          location: "22.746, 75.842",
+        },
+        {
+          title: "Exposed electric wire",
+          desc: "Low hanging wires after storm. Risk of electrocution.",
+          status: "progress",
+          category: "Electricity",
+          time: "1 day ago",
+          location: "22.698, 75.842",
+        },
+        {
+          title: "Underground pipe burst",
+          desc: "Water gushing from underground pipe burst.",
+          status: "resolved",
+          category: "Water",
+          time: "2 days ago",
+          location: "22.720, 75.859",
+        },
+      ];
+
+      const container = document.getElementById("feedContainer");
+
+      complaints.forEach((c) => {
+        container.innerHTML += `
+        <div class="feed-card">
+
+          <div class="feed-title">${c.title}</div>
+          <div class="feed-desc">${c.desc}</div>
+
+          <div class="feed-meta">
+            <span class="category">⚡ ${c.category}</span>
+
+            <span class="badge ${c.status}">
+              ${c.status === "progress" ? "In Progress" : c.status}
+            </span>
+
+            <span>⏱ ${c.time}</span>
+            <span>📍 ${c.location}</span>
+          </div>
+
+        </div>
+      `;
+      });
     </script>
   </body>
 </html>
