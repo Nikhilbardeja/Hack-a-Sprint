@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %} {% endblock %}</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='/css/Dashboard.css') }}" />
+
+    <!-- Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    {% block head %}{% endblock %}
+  </head>
+
+  <body>
+    <div class="dashboard">
+      <!-- ================= SIDEBAR ================= -->
+      <div class="sidebar">
+        <div class="brand">
+          <i data-lucide="map-pin"></i>
+          <span>CGT - Citizen</span>
+        </div>
+
+        <ul>
+          <li class="active">
+            <a href="/">
+            <i data-lucide="layout-dashboard"></i> Dashboard
+          </li>
+          </a>
+          <li>
+            <a href="/submit-complaint">
+              <i data-lucide="plus-circle"></i> Submit Complaint
+            </a>
+          </li>
+          <li><i data-lucide="file-text"></i> My Complaints</li>
+          <li>
+            <a href="/public-feed">
+              <i data-lucide="plus-circle"></i> Public Feed
+            </a>
+          </li>
+        </ul>
+      </div>
+
+ {% block content %}{% endblock %}
+
+
+  </body>
+</html>

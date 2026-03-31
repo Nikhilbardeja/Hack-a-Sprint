@@ -1,0 +1,85 @@
+{% extends "layout.html" %}
+
+{% block title %}Citizen Dashboard{% endblock %}
+ 
+{% block content %}
+      <!-- ================= MAIN ================= -->
+      <div class="main">
+        <!-- TOPBAR -->
+        <div class="topbar">
+          <div class="left">
+            <h3>Citizen Dashboard</h3>
+            <input
+              type="text"
+              placeholder="Search complaints..."
+              class="search"
+            />
+          </div>
+
+          <div class="right">
+            <span id="userEmail">user@email.com</span>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+          </div>
+        </div>
+
+        <!-- TITLE -->
+        <h2 class="title">Overview</h2>
+
+        <!-- CARDS -->
+        <div class="cards">
+          <div class="card">
+            <i data-lucide="file-text" class="icon blue"></i>
+            <h3 id="total">{{ data.get("length") }}</h3>
+            <p>Total</p>
+          </div>
+
+          <div class="card">
+            <i data-lucide="clock" class="icon yellow"></i>
+            <h3 id="pending">{{ data.get("pending") }}</h3>
+            <p>Pending</p>
+          </div>
+
+          <div class="card">
+            <i data-lucide="alert-triangle" class="icon cyan"></i>
+            <h3 id="progress">{{data.get("inProgress")}}</h3>
+            <p>In Progress</p>
+          </div>
+
+          <div class="card">
+            <i data-lucide="check-circle" class="icon green"></i>
+            <h3 id="resolved">{{ data.get("resolved") }}</h3>
+            <p>Resolved</p>
+          </div>
+        </div>
+
+        <!-- RECENT COMPLAINTS -->
+        <div class="bottom-section">
+          <h3>Recent Complaints</h3>
+
+          <table class="complaint-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Title</th>
+                <th>Status</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+
+            <tbody id="complaintBody">
+              <tr>
+                {% for complaint in data.get("complaints") %}
+                <tr>
+                  <td>#101</td>
+                  <td>{{complaint.get("title")}}</td>
+                  <td class="{{complaint.get('status').lower()}}">{{complaint.get("status")}}</td>
+                  <td>{{complaint.get("date")}}</td>
+                </tr>
+                {% endfor %}
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+{% endblock %}

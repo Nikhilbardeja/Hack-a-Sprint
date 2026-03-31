@@ -1,0 +1,86 @@
+{% extends "layout.html" %}
+
+{% block title %}Submit Complaint | Citizen Dashboard{% endblock %}
+
+{% block content %}
+
+      <!-- ================= MAIN ================= -->
+      <div class="main">
+        <!-- TOPBAR -->
+        <div class="topbar">
+          <div class="left">
+            <h3>Submit Complaint</h3>
+          </div>
+
+          <div class="right">
+            <span id="userEmail">user@email.com</span>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+          </div>
+        </div>
+
+        <!-- ================= FORM ================= -->
+        <div class="form-section">
+          <div class="form-card">
+            <h2>Raise a Complaint</h2>
+
+            <form action="/add-complaint" method="post" enctype="multipart/form-data">
+              <div class="input-group">
+                <label>Complaint Title</label>
+                <input type="text" id="title" required name="title"/>
+              </div>
+
+              <div class="input-group">
+                <label>Description</label>
+                <textarea id="desc" rows="4" required name="description"></textarea>
+              </div>
+
+              <div class="input-group">
+                <label>Address</label>
+                <input type="text" id="address" required name="location"/>
+              </div>
+
+              <div class="input-group">
+                <label>Upload Image</label>
+                <input type="file" name="image"/>
+              </div>
+
+              <button class="submit-btn">Submit Complaint</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      lucide.createIcons();
+
+      function goTo(page) {
+        window.location.href = page;
+      }
+
+      function logout() {
+        localStorage.clear();
+        window.location.href = "login.html";
+      }
+
+      function submitComplaint(e) {
+        e.preventDefault();
+
+        const complaint = {
+          id: Date.now(),
+          title: document.getElementById("title").value,
+          desc: document.getElementById("desc").value,
+          address: document.getElementById("address").value,
+          status: "pending",
+          date: new Date().toLocaleDateString(),
+        };
+
+        let data = JSON.parse(localStorage.getItem("complaints")) || [];
+        data.push(complaint);
+        localStorage.setItem("complaints", JSON.stringify(data));
+
+        alert("Complaint submitted!");
+        window.location.href = "dashboard.html";
+      }
+    </script>
+{% endblock %}
