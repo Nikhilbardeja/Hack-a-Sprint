@@ -1,4 +1,4 @@
-from flask import jsonify, request, current_app
+from flask import jsonify, request, current_app, flash, redirect, url_for, session
 import os
 
 from app import mysql
@@ -25,10 +25,12 @@ def addComplaints():
 
     cur = mysql.connection.cursor()
 
-    cur.execute("INSERT INTO complaints (id, title, description, location, image) VALUES (%s, %s, %s, %s, %s)",
-                 (generate_random_string(10), data.get("title"), data.get("description"), data.get("location"), fileName,))
+    cur.execute("INSERT INTO complaints (id, title, description, location, image, citizenId) VALUES (%s, %s, %s, %s, %s, %s)",
+                 (generate_random_string(10), data.get("title"), data.get("description"), data.get("location"), fileName, session.get("id"),))
     mysql.connection.commit()
 
     cur.close()
 
-    return jsonify({"status": "success", "message": "Complaint Regiseterd Successfully"}), 200
+    flash("Complaint Regiseterd Successfully")
+
+    return redirect(url_for("citizen.home"))
