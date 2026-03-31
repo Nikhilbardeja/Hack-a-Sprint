@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Public Feed</title>
+
+    <link rel="stylesheet" href="PublicFeed.css" />
+    <script src="https://unpkg.com/lucide@latest"></script>
+  </head>
+
+  <body>
+    <div class="dashboard">
+      <!-- ================= SIDEBAR (SAME AS DASHBOARD) ================= -->
+      <div class="sidebar">
+        <div class="brand">
+          <i data-lucide="map-pin"></i>
+          <span>CGT - Citizen</span>
+        </div>
+
+        <ul>
+          <li onclick="goTo('dashboard.html')">
+            <i data-lucide="layout-dashboard"></i> Dashboard
+          </li>
+
+          <li onclick="goTo('complaint.html')">
+            <i data-lucide="plus-circle"></i> Submit Complaint
+          </li>
+
+          <li onclick="goTo('my-complaints.html')">
+            <i data-lucide="file-text"></i> My Complaints
+          </li>
+
+          <li class="active"><i data-lucide="globe"></i> Public Feed</li>
+        </ul>
+      </div>
+
+      <!-- ================= MAIN ================= -->
+      <div class="main">
+        <!-- TOPBAR (SAME AS DASHBOARD) -->
+        <div class="topbar">
+          <div class="left">
+            <h3>Public Feed</h3>
+            <input
+              type="text"
+              placeholder="Search complaints..."
+              class="search"
+            />
+          </div>
+
+          <div class="right">
+            <span id="userEmail">user@email.com</span>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+          </div>
+        </div>
+
+        <!-- TITLE -->
+        <h2 class="title">Recent Complaints</h2>
+
+        <!-- FEED (ONLY CHANGE PART) -->
+        <div class="feed-container" id="feedContainer"></div>
+      </div>
+    </div>
+
+    <!-- JS -->
+    <script>
+      lucide.createIcons();
+
+      function goTo(page) {
+        window.location.href = page;
+      }
+
+      function logout() {
+        localStorage.clear();
+        window.location.href = "login.html";
+      }
+
+      // Sample data
+      const complaints = [
+        {
+          title: "Sparking in junction box",
+          desc: "Junction box near temple creating fire hazard.",
+          status: "pending",
+          category: "Electricity",
+          time: "1 day ago",
+          location: "22.746, 75.842",
+        },
+        {
+          title: "Exposed electric wire",
+          desc: "Low hanging wires after storm. Risk of electrocution.",
+          status: "progress",
+          category: "Electricity",
+          time: "1 day ago",
+          location: "22.698, 75.842",
+        },
+        {
+          title: "Underground pipe burst",
+          desc: "Water gushing from underground pipe burst.",
+          status: "resolved",
+          category: "Water",
+          time: "2 days ago",
+          location: "22.720, 75.859",
+        },
+      ];
+
+      const container = document.getElementById("feedContainer");
+
+      complaints.forEach((c) => {
+        container.innerHTML += `
+        <div class="feed-card">
+
+          <div class="feed-title">${c.title}</div>
+          <div class="feed-desc">${c.desc}</div>
+
+          <div class="feed-meta">
+            <span class="category">⚡ ${c.category}</span>
+
+            <span class="badge ${c.status}">
+              ${c.status === "progress" ? "In Progress" : c.status}
+            </span>
+
+            <span>⏱ ${c.time}</span>
+            <span>📍 ${c.location}</span>
+          </div>
+
+        </div>
+      `;
+      });
+    </script>
+  </body>
+</html>
