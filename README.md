@@ -93,6 +93,3 @@ GRIEVANCE/
 ├── README.md                # Project documentation
 └── server.py                # Entry point to run Flask app
 
-## License
-
-Built with [Lovable](https://lovable.dev).
