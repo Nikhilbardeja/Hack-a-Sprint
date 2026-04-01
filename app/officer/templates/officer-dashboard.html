@@ -1,0 +1,105 @@
+{% extends "layout.html" %}
+
+{% block content %}
+      <!-- ===== MAIN ===== -->
+      <div class="main">
+        <!-- TOPBAR -->
+        <div class="topbar">
+          <h1>Officer Dashboard</h1>
+
+          <div class="right">
+            <button class="filter">Oldest First</button>
+            <a href="/logout"><button
+              style="background-color: red; height: 32px; width: 70px; border-radius: 20%;"
+              class="logout-btn"
+              onclick="logout()"
+            >
+              Logout
+            </button></a>
+          </div>
+        </div>
+
+        <!-- ===== STATS ===== -->
+        <!-- <div class="stats">
+          <div class="stat-card pending">
+            <h2>51</h2>
+            <p>Pending</p>
+          </div>
+
+          <div class="stat-card progress">
+            <h2>31</h2>
+            <p>In Progress</p>
+          </div>
+        </div> -->
+
+        <!-- ===== TASK CARD 1 ===== -->
+        <!-- <div class="task-card">
+          <div class="task-header">
+            <div>
+              <h3>Unfinished road work</h3>
+              <p>Road repair started months ago still incomplete.</p>
+            </div>
+
+            <select class="status resolved">
+              <option>Resolved</option>
+              <option>Pending</option>
+              <option>In Progress</option>
+            </select>
+          </div>
+
+          <div class="meta">
+            <span class="tag road">Road</span>
+            <span class="status-tag resolved">Resolved</span>
+            <span>⏱ 2 months ago</span>
+            <span>📍 22.770, 75.852</span>
+          </div>
+
+          <textarea placeholder="Add a remark..."></textarea>
+        </div> -->
+
+        <!-- ===== TASK CARD 2 ===== -->
+         {% for complaint in data.get("complaints") %}
+        <div class="task-card">
+          <div class="task-header">
+            <div>
+              <h3>{{ complaint.get("title") }}</h3>
+              <p>{{ complaint.get("description") }}</p>
+            </div>
+            
+            <form action="/officer/update-status/{{complaint.get('id')}}" method="post">
+                <select class="status {{complaint.get('status')}}" name="status">
+                <option value="pending">Pending</option>
+                <option value="inProgress">In Progress</option>
+                <option value="resolved">Resolved</option>
+                </select>
+                <button style="height: 32px; width: 105px; border-radius: 20%; background-color: rgb(79, 79, 244);" type="submit">Update Status</button>
+            </form>
+          </div>
+
+          <div class="meta">
+            <span class="tag {{ complaint.get('category').lower() }}">{{ complaint.get("category") }}</span>
+            <span class="status-tag {{ complaint.get('status') }}">{{ complaint.get("status") }}</span>
+            <span>⏱ {{ complaint.get("date") }}</span>
+            <span>📍 {{ complaint.get("location") }}</span>
+            <!-- <span class="severity">Severity: 5/5</span> -->
+          </div>
+
+          <!-- <div class="remark-box">
+            <textarea placeholder="Add a remark..."></textarea>
+            <button>Send</button>
+          </div> -->
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <script>
+      lucide.createIcons();
+
+      function goTo(page) {
+        window.location.href = page;
+      }
+
+
+    </script>
+{% endblock %}

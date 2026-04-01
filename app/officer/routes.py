@@ -1,4 +1,4 @@
-from flask import jsonify, request
+from flask import jsonify, request, redirect, url_for
 import MySQLdb
 
 from app import mysql
@@ -28,9 +28,9 @@ def getComplaints():
     return jsonify(data)
 
 
-@officer.route("/update-status/<id>/<status>", methods=["PUT"])
-def updateStatus(id, status):
-    data = request.json
+@officer.route("/update-status/<id>", methods=["POST"])
+def updateStatus(id):
+    status = request.form.to_dict().get("status")
 
     cur = mysql.connection.cursor()
 
@@ -39,4 +39,14 @@ def updateStatus(id, status):
 
     cur.close()
 
-    return jsonify({"status": "success", "message":"Complaint Updated Successfully"}), 200
+    return redirect(url_for("officer.dashboard"))
+
+
+@officer.route("/heatmap-data")
+def heatMapData():
+    cur = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("SELECT * FROM COMPLAINTS")
+    result = cur.fetchall()
+    cur.close
+    print(result)
+    return jsonify(result)

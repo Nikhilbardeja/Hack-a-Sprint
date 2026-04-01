@@ -1,0 +1,76 @@
+
+{% extends "admin-layout.html" %}
+{% block head %} 
+<link rel="stylesheet" href="{{ url_for('static', filename='/css/add-officer.css')}}">
+{% endblock %}
+{% block content %}
+      <!-- MAIN -->
+      <div class="main">
+        <div class="topbar">
+          <h3>Manage Users & Complaints</h3>
+          <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+
+        <!-- ADD OFFICER -->
+        <div class="card">
+          <h3>Add Officer</h3>
+          <form action="/admin/api/add-officer" method="post" enctype="multipart/form-data">
+          <input type="text" id="officerName" placeholder="Officer Name" name="name" />
+          <input type="email" id="officerEmail" placeholder="Officer Email" name="email"/>
+          <input
+            type="password"
+            id="officerPassword"
+            placeholder="Officer Password"
+            name="password"
+          />
+          <button class="btn btn-add" type="submit">
+            Add Officer
+          </button>
+          </form>
+        </div>
+<!-- 
+        <div class="card">
+          <h3>Officers</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="officerTable"></tbody>
+          </table>
+        </div>
+
+        <div class="card">
+          <h3>Recent Complaints</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="recentTable"></tbody>
+          </table>
+        </div>
+
+        <div class="card">
+          <h3>Unresolved Complaints</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="unsolvedTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </div> -->
+
+{% endblock %}

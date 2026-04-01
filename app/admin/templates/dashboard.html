@@ -1,0 +1,129 @@
+{% extends "admin-layout.html" %}
+
+{% block content %}
+
+    <div class="main">
+      <div class="topbar">
+        <h1>Admin Dashboard</h1>
+      </div>
+
+      <div class="cards">
+        <div class="card">
+          <h2 id="total">0</h2>
+          <p>Total</p>
+        </div>
+        <div class="card">
+          <h2 id="pending">0</h2>
+          <p>Pending</p>
+        </div>
+        <div class="card">
+          <h2 id="progress">0</h2>
+          <p>In Progress</p>
+        </div>
+        <div class="card">
+          <h2 id="resolved">0</h2>
+          <p>Resolved</p>
+        </div>
+        <div class="card overdue">
+          <h2 id="overdue">0</h2>
+          <p>Overdue</p>
+        </div>
+      </div>
+
+      <div class="charts">
+        <div class="chart-box">
+          <h3>Complaints by Category</h3>
+          <canvas id="categoryChart"></canvas>
+        </div>
+
+        <div class="chart-box">
+          <h3>Avg Resolution Time (days)</h3>
+          <canvas id="timeChart"></canvas>
+        </div>
+      </div>
+    </div>
+ 
+    <script>
+      let categoryChartInstance;
+      let timeChartInstance;
+
+      async function fetchDashboardData() {
+        try {
+          const response = await fetch("/admin/get-data"); 
+          const data = await response.json();
+
+          const categoryData = data.categoryData;
+          const timeData = data.timeData;
+
+          // ===== Stats Calculation =====
+          const total = categoryData.values.reduce((a, b) => a + b, 0);
+          const pending = Math.floor(total * 0.48);
+          const progress = Math.floor(total * 0.32);
+          const resolved = Math.floor(total * 0.2);
+          const overdue = Math.floor(total * 0.25);
+
+          document.getElementById("total").innerText = total;
+          document.getElementById("pending").innerText = pending;
+          document.getElementById("progress").innerText = progress;
+          document.getElementById("resolved").innerText = resolved;
+          document.getElementById("overdue").innerText = overdue;
+
+          // ===== Destroy old charts (IMPORTANT) =====
+          if (categoryChartInstance) categoryChartInstance.destroy();
+          if (timeChartInstance) timeChartInstance.destroy();
+
+          // ===== Category Chart =====
+          categoryChartInstance = new Chart(
+            document.getElementById("categoryChart"),
+            {
+              type: "bar",
+              data: {
+                labels: categoryData.labels,
+                datasets: [
+                  {
+                    label: "Complaints",
+                    data: categoryData.values,
+                    backgroundColor: "#3b82f6",
+                  },
+                ],
+              },
+              options: {
+                plugins: { legend: { display: false } },
+                scales: {
+                  x: { ticks: { color: "#aaa" } },
+                  y: { ticks: { color: "#aaa" } },
+                },
+              },
+            },
+          );
+
+          // ===== Time Chart =====
+          timeChartInstance = new Chart(document.getElementById("timeChart"), {
+            type: "bar",
+            data: {
+              labels: timeData.labels,
+              datasets: [
+                {
+                  label: "Days",
+                  data: timeData.values,
+                  backgroundColor: "#22c55e",
+                },
+              ],
+            },
+            options: {
+              plugins: { legend: { display: false } },
+              scales: {
+                x: { ticks: { color: "#aaa" } },
+                y: { ticks: { color: "#aaa" } },
+              },
+            },
+          });
+        } catch (error) {
+          console.error("❌ Error fetching data:", error);
+        }
+      }
+
+      // Call when page loads
+      window.onload = fetchDashboardData;
+    </script>
+{% endblock %}

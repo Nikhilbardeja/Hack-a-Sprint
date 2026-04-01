@@ -1,16 +1,24 @@
-{% extends "layout.html" %}
+{% extends "citizen-layout.html" %}
 
 {% block title %}Submit Complaint | Citizen Dashboard{% endblock %}
 
+{% block head %} 
+<link rel="stylesheet" href="{{ url_for('static', filename='/css/submit-complaint.css')}}" />
+  <!-- Leaflet -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+    <!-- Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+ {% endblock %}
+
 {% block content %}
 
-      <!-- ================= MAIN ================= -->
+<!-- ================= MAIN ================= -->
       <div class="main">
         <!-- TOPBAR -->
         <div class="topbar">
-          <div class="left">
-            <h3>Submit Complaint</h3>
-          </div>
+          <h3>Submit Complaint</h3>
 
           <div class="right">
             <span id="userEmail">user@email.com</span>
@@ -34,10 +42,49 @@
                 <textarea id="desc" rows="4" required name="description"></textarea>
               </div>
 
-              <div class="input-group">
-                <label>Address</label>
-                <input type="text" id="address" required name="location"/>
+              <div class="grid">
+                <div class="input-group">
+                  <label>Category</label>
+                  <select id="category" name="category">
+                    <option value="Road">Road</option>
+                    <option value="Water">Water</option>
+                    <option value="Garbage">Garbage</option>
+                    <option value="Electricity">Electricity</option>
+                    <option value="Others">Others</option>
+                  </select>
+                </div>
+
+                <div class="input-group">
+                  <label>Severity</label>
+                  <select id="severity" name="severtiy">
+                    <option value="1">1 - Low</option>
+                    <option value="2">2 - Low</option>
+                    <option value="3">3 - Medium</option>
+                    <option value="4">4 - High</option>
+                    <option value="5">5 - Critical</option>
+                  </select>
+                </div>
               </div>
+
+              <div class="input-group">
+                <label>Location (click map)</label>
+                <div id="map"></div>
+              </div>
+
+              <!-- Coordinates -->
+              <p class="coords">
+                Lat: <span id="lat">0</span>, Lng: <span id="lng">0</span>
+              </p>
+
+              <!-- Address -->
+              <p class="address">
+                <span id="address">Fetching location...</span>
+              </p>
+
+              <!-- Hidden Inputs -->
+              <input type="hidden" id="latInput"  name="latitude"/>
+              <input type="hidden" id="lngInput" name="longitude"/>
+              <input type="hidden" id="addressInput" name="location"/>
 
               <div class="input-group">
                 <label>Upload Image</label>
@@ -51,6 +98,7 @@
       </div>
     </div>
 
+    <!-- ================= SCRIPT ================= -->
     <script>
       lucide.createIcons();
 
@@ -63,6 +111,58 @@
         window.location.href = "login.html";
       }
 
+      // ===== MAP INIT =====
+      const map = L.map("map").setView([22.7196, 75.8577], 13);
+
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(
+        map,
+      );
+
+      let marker = L.marker([22.7196, 75.8577], { draggable: true }).addTo(map);
+
+      // ===== GET ADDRESS =====
+      async function getAddress(lat, lng) {
+        try {
+          const res = await fetch(`
+            https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}
+          `);
+          const data = await res.json();
+
+          if (data && data.display_name) {
+            document.getElementById("address").innerText = data.display_name;
+            document.getElementById("addressInput").value = data.display_name;
+          }
+        } catch (err) {
+          document.getElementById("address").innerText =
+            "Error fetching location";
+        }
+      }
+
+      // ===== UPDATE =====
+      function updateCoords(lat, lng) {
+        document.getElementById("lat").innerText = lat.toFixed(4);
+        document.getElementById("lng").innerText = lng.toFixed(4);
+
+        document.getElementById("latInput").value = lat;
+        document.getElementById("lngInput").value = lng;
+
+        getAddress(lat, lng);
+      }
+
+      // Initial
+      updateCoords(22.7196, 75.8577);
+
+      map.on("click", function (e) {
+        marker.setLatLng(e.latlng);
+        updateCoords(e.latlng.lat, e.latlng.lng);
+      });
+
+      marker.on("dragend", function () {
+        const pos = marker.getLatLng();
+        updateCoords(pos.lat, pos.lng);
+      });
+
+      // ===== SUBMIT =====
       function submitComplaint(e) {
         e.preventDefault();
 
@@ -70,7 +170,11 @@
           id: Date.now(),
           title: document.getElementById("title").value,
           desc: document.getElementById("desc").value,
-          address: document.getElementById("address").value,
+          category: document.getElementById("category").value,
+          severity: document.getElementById("severity").value,
+          latitude: document.getElementById("latInput").value,
+          longitude: document.getElementById("lngInput").value,
+          address: document.getElementById("addressInput").value,
           status: "pending",
           date: new Date().toLocaleDateString(),
         };
@@ -79,8 +183,16 @@
         data.push(complaint);
         localStorage.setItem("complaints", JSON.stringify(data));
 
-        alert("Complaint submitted!");
+        alert("Complaint submitted successfully!");
         window.location.href = "dashboard.html";
       }
     </script>
+
+    <!-- ===== FIX MAP HEIGHT ===== -->
+    <style>
+      #map {
+        height: 300px;
+        border-radius: 10px;
+      }
+    </style>
 {% endblock %}

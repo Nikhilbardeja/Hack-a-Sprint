@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='/css/admin-dashboard.css')}}" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    {% block head %}{% endblock %}
+  </head>
+  <body>
+    <div class="sidebar">
+      <h2>CGT - Admin</h2>
+      <ul>
+        <!-- <li class="active">Dashboard</li> -->
+        <li><a href="/admin">Analytics</a></li>
+        <!-- <li>Complaints Map</li> -->
+        <li><a href="/admin/add-officer">Add Officer</a></li>
+        <li><a href="/admin/overdue">Overdue Alerts</a></li>
+      </ul>
+    </div>
+
+
+  {% block content %}{% endblock %}
+      </body>
+</html>

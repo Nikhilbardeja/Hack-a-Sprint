@@ -1,0 +1,113 @@
+{% extends "layout.html" %}
+
+
+      {% block head %}  
+    <style>
+      /* ===== MAP CARD ===== */
+      .map-container {
+        height: 500px;
+        border-radius: 12px;
+        overflow: hidden;
+        margin-top: 20px;
+        border: 1px solid #1e293b;
+      }
+
+      #map {
+        height: 100%;
+        width: 100%;
+      }
+    </style>  
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+    <!-- ICONS -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+      {% endblock %}
+{% block content %}
+
+      <!-- ===== MAIN ===== -->
+      <div class="main">
+        <!-- TOPBAR -->
+        <div class="topbar">
+          <h3>📍 Complaint Map</h3>
+
+          <div class="right">
+            <span>officer@email.com</span>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+          </div>
+        </div>
+
+        <!-- MAP -->
+        <div class="map-container">
+          <div id="map"></div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+  lucide.createIcons();
+
+  function goTo(page) {
+    window.location.href = page;
+  }
+
+  function logout() {
+    localStorage.clear();
+    window.location.href = "login.html";
+  }
+
+  // ===== MAP INIT =====
+  const map = L.map("map").setView([22.7196, 75.8577], 13);
+
+  // DARK TILE
+  L.tileLayer(
+    "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+  ).addTo(map);
+
+  // CATEGORY COLORS
+  const categoryColors = {
+    Road: "#eab308",
+    Water: "#0ea5e9",
+    Garbage: "#22c55e",
+    Electricity: "#f97316",
+    Others: "#94a3b8",
+  };
+
+  // ===== FETCH COMPLAINTS FROM BACKEND =====
+  async function loadComplaints() {
+    try {
+      const res = await fetch("/officer/heatmap-data"); // change URL
+      const complaints = await res.json();
+
+      complaints.forEach((c) => {
+        const color = categoryColors[c.category] || "#94a3b8";
+
+        const marker = L.circleMarker([c.latitude, c.longitude], { // FIXED HERE
+          radius: 10,
+          fillColor: color,
+          color: color,
+          weight: 2,
+          fillOpacity: 0.8,
+        }).addTo(map);
+
+        marker.bindPopup(`
+          <div style="min-width:150px;">
+            <strong>${c.title}</strong><br/>
+            <span style="color:#94a3b8;">${c.status}</span>
+          </div>
+        `);
+
+        marker.on("mouseover", () => marker.openPopup());
+        marker.on("mouseout", () => marker.closePopup());
+      });
+
+    } catch (err) {
+      console.error("Error loading complaints:", err);
+    }
+  }
+
+  // LOAD DATA
+  loadComplaints();
+</script>
+{% endblock %}

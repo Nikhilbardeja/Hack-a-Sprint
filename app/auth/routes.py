@@ -29,7 +29,7 @@ def loginApi():
             session["loggedIn"] = True
             session['id'] = result.get("id")
             flash("Logged in successfully", "successs")
-            return redirect(url_for("citizen.home"))
+            return redirect(url_for(f"{data.get('role')}.home"))
     flash("Invalid Credentials", "error")
     return redirect(url_for("auth.login"))
 

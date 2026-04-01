@@ -25,8 +25,9 @@ def addComplaints():
 
     cur = mysql.connection.cursor()
 
-    cur.execute("INSERT INTO complaints (id, title, description, location, image, citizenId) VALUES (%s, %s, %s, %s, %s, %s)",
-                 (generate_random_string(10), data.get("title"), data.get("description"), data.get("location"), fileName, session.get("id"),))
+    cur.execute("INSERT INTO complaints (id, title, description, location, image, citizenId, latitude, longitude, category) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                 (generate_random_string(10), data.get("title"), data.get("description"), data.get("location"), fileName,
+                   session.get("id"), data.get("latitude"), data.get("longitude"), data.get("category")))
     mysql.connection.commit()
 
     cur.close()

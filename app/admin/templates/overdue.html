@@ -1,0 +1,149 @@
+
+{% extends "admin-layout.html" %}
+{% block head %} 
+<link rel="stylesheet" href="{{ url_for('static', filename='/css/overdue.css')}}">
+<script src="https://unpkg.com/lucide@latest"></script>
+{% endblock %}
+{% block content %}
+
+      <!-- MAIN -->
+      <div class="main">
+        <div class="topbar">
+          <h3>⏱ Overdue Complaints</h3>
+          <button class="logout-btn" onclick="goTo('../login.html')">
+            Logout
+          </button>
+        </div>
+
+        <!-- STATS -->
+        <div class="stats">
+          <div class="stat-card">
+            <h2 id="total">0</h2>
+            <p>Total Overdue</p>
+          </div>
+          <div class="stat-card red">
+            <h2 id="critical">0</h2>
+            <p>Critical (5+ days)</p>
+          </div>
+        </div>
+
+        <!-- TABLE -->
+        <div class="card">
+          <h3>Overdue Complaints List</h3>
+
+          <table>
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Days Pending</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+
+            <tbody id="overdueTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      lucide.createIcons();
+
+      function goTo(page) {
+        window.location.href = page;
+      }
+
+      // ===== GLOBAL STATE =====
+      let complaints = [];
+
+      // ===== FETCH DATA =====
+      async function loadComplaints() {
+        try {
+          const res = await fetch("/admin/data");
+          const data = await res.json();
+
+          complaints = data;
+
+          renderOverdue();
+        } catch (err) {
+          console.error("Error fetching complaints:", err);
+        }
+      }
+
+      // ===== CALCULATE DAYS =====
+      function getDays(dateStr) {
+        const created = new Date(dateStr);
+        const now = new Date();
+        const diff = now - created;
+        return Math.floor(diff / (1000 * 60 * 60 * 24));
+      }
+
+      // ===== RENDER TABLE =====
+      function renderOverdue() {
+        const overdue = complaints.filter((c) => {
+          const days = getDays(c.date);
+          return days >= 0 && c.status !== "resolved";
+        });
+
+        const table = document.getElementById("overdueTable");
+        table.innerHTML = "";
+
+        let criticalCount = 0;
+
+        overdue.forEach((c) => {
+          const days = getDays(c.date);
+
+          if (days >= 5) criticalCount++;
+
+          table.innerHTML += `
+            <tr class="${days >= 5 ? "critical" : ""}">
+              <td>${c.title}</td>
+              <td>${days} days</td>
+              <td>${c.status}</td>
+              <td>
+                <button class="btn delete" onclick="removeComplaint('${c.id}')">Delete</button>
+              </td>
+            </tr>
+          `;
+        });
+
+        document.getElementById("total").innerText = overdue.length;
+        document.getElementById("critical").innerText = criticalCount;
+      }
+
+      // ===== RESOLVE =====
+      async function resolve(id) {
+        try {
+          await fetch(`http://localhost:5000/api/${id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ status: "resolved" }),
+          });
+
+          loadComplaints();
+        } catch (err) {
+          console.error("Error resolving:", err);
+        }
+      }
+
+      // ===== DELETE =====
+      async function removeComplaint(id) {
+        try {
+          await fetch(`/admin/api/complaints/delete/${id}`, {
+            method: "DELETE",
+          });
+
+          loadComplaints();
+        } catch (err) {
+          console.error("Error deleting:", err);
+        }
+      }
+
+   
+      setInterval(loadComplaints, 10000);
+
+    
+      loadComplaints();
+    </script>
+{% endblock %}
